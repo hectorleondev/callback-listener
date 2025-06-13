@@ -47,19 +47,13 @@ export function WebhookCard({ webhook }: WebhookCardProps) {
     deleteWebhook.mutate(webhook.path_id);
   };
 
-  const webhookUrl = `${clientEnv.NEXT_PUBLIC_APP_URL}/api/webhooks/${webhook.path_id}`;
+  const webhookUrl = `${clientEnv.NEXT_PUBLIC_API_URL}/webhook/${webhook.path_id}`;
   
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge 
-              variant={webhook.status === 'active' ? 'success' : 'destructive'}
-              className="capitalize"
-            >
-              {webhook.status}
-            </Badge>
             <CardTitle className="text-lg">{webhook.path_id}</CardTitle>
           </div>
         </div>

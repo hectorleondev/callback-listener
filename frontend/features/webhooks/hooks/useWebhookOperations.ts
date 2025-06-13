@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { webhookService } from '@/lib/services/api.service';
+import { clientWebhookService } from '@/lib/services/client-api.service';
 import { useToast } from '@/components/ui/use-toast';
 import type { WebhookPath } from '../types/webhook.types';
 
@@ -10,7 +10,7 @@ async function createWebhook(formData: FormData) {
   const pathId = formData.get('path_id') as string;
   
   try {
-    const result = await webhookService.createWebhook({ 
+    const result = await clientWebhookService.createWebhook({ 
       path_id: pathId || undefined 
     });
     
@@ -25,7 +25,7 @@ async function createWebhook(formData: FormData) {
 
 async function deleteWebhook(pathId: string) {
   try {
-    const result = await webhookService.deleteWebhook(pathId);
+    const result = await clientWebhookService.deleteWebhook(pathId);
     return result;
   } catch (error) {
     return { 
@@ -54,7 +54,7 @@ export function useCreateWebhook() {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         request_count: 0,
-        status: 'active',
+
       };
       
       queryClient.setQueryData(['webhooks'], (old: WebhookPath[] = []) => 
@@ -96,7 +96,7 @@ export function useWebhooks() {
   return useQuery({
     queryKey: ['webhooks'],
     queryFn: async () => {
-      const result = await webhookService.getWebhooks();
+      const result = await clientWebhookService.getWebhooks();
       return result.data || [];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes

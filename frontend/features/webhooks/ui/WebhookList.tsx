@@ -19,9 +19,6 @@ export function WebhookList() {
     let result = [...webhooks];
     
     // Apply filters
-    if (filters.status) {
-      result = result.filter(webhook => webhook.status === filters.status);
-    }
     
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -71,7 +68,7 @@ export function WebhookList() {
   }
   
   if (!filteredWebhooks.length) {
-    if (filters.search || filters.status) {
+    if (filters.search) {
       return (
         <EmptyState
           title="No matching webhooks"

@@ -1,13 +1,13 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { dashboardService } from '@/lib/services/api.service';
+import { clientDashboardService } from '@/lib/services/client-api.service';
 
 export function useDashboardStats() {
   return useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const result = await dashboardService.getStats();
+      const result = await clientDashboardService.getStats();
       
       if (!result.success) {
         throw new Error(result.error);

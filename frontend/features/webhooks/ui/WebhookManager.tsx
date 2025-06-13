@@ -19,9 +19,7 @@ export function WebhookManager() {
     setFilters({ search: e.target.value });
   };
   
-  const handleStatusChange = (value: string) => {
-    setFilters({ status: value === 'all' ? null : value as any });
-  };
+
   
   const handleSortByChange = (value: string) => {
     setFilters({ sortBy: value as any });
@@ -31,7 +29,7 @@ export function WebhookManager() {
     setFilters({ sortOrder: value as 'asc' | 'desc' });
   };
   
-  const hasActiveFilters = filters.search || filters.status;
+  const hasActiveFilters = filters.search;
   
   return (
     <div className="space-y-8">
@@ -93,25 +91,7 @@ export function WebhookManager() {
             "overflow-hidden transition-all",
             showFilters ? "opacity-100" : "opacity-0"
           )}>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-              <div className="space-y-2">
-                <Label htmlFor="status-filter">Status</Label>
-                <Select 
-                  value={filters.status || 'all'} 
-                  onValueChange={handleStatusChange}
-                >
-                  <SelectTrigger id="status-filter">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
-                    <SelectItem value="error">Error</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="sort-by">Sort By</Label>
                 <Select 

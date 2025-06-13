@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { requestService } from '@/lib/services/api.service';
+import { clientRequestService } from '@/lib/services/client-api.service';
 import { useRequestStore } from '@/lib/stores/requestStore';
 import type { CapturedRequest } from '../types/request.types';
 
@@ -12,7 +12,7 @@ export function useWebhookLogs(pathId: string) {
   return useQuery({
     queryKey: ['webhook-logs', pathId, filters, pagination],
     queryFn: async () => {
-      const result = await requestService.getLogs(pathId, {
+      const result = await clientRequestService.getLogs(pathId, {
         limit: pagination.limit,
         offset: pagination.offset,
         method: filters.method || undefined,
@@ -38,7 +38,7 @@ export function useRequestDetails(pathId: string, requestId: string) {
   return useQuery({
     queryKey: ['request-details', pathId, requestId],
     queryFn: async () => {
-      const result = await requestService.getRequestDetails(pathId, requestId);
+      const result = await clientRequestService.getRequestDetails(pathId, requestId);
       
       if (!result.success) {
         throw new Error(result.error);
