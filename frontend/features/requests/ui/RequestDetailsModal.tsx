@@ -29,10 +29,11 @@ export function RequestDetailsModal({
   const { toast } = useToast();
   
   const handleCopy = (content: string, label: string) => {
-    toast({
-      title: `${label} copied to clipboard`,
-      variant: "success",
-    });
+    console.log(`${label} copied to clipboard`);
+    // toast({
+    //   title: `${label} copied to clipboard`,
+    //   variant: "success",
+    // });
   };
   
   if (!request) return null;

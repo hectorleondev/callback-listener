@@ -21,6 +21,12 @@ import { Webhook } from 'lucide-react';
 interface RequestsTableProps {
   requests: CapturedRequest[];
   pathId: string;
+  pagination?: {
+    total: number;
+    limit: number;
+    offset: number;
+    has_more: boolean;
+  };
   isLoading?: boolean;
   isError?: boolean;
 }
@@ -28,6 +34,7 @@ interface RequestsTableProps {
 export function RequestsTable({ 
   requests, 
   pathId, 
+  pagination,
   isLoading = false,
   isError = false,
 }: RequestsTableProps) {
