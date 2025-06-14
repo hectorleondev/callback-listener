@@ -63,19 +63,23 @@ logs-db: ## View logs from database service only
 
 # Database Management
 migrate: ## Run database migrations
-	python3 -m flask db upgrade
+	docker compose exec backend flask db upgrade
 
 migrate-create: ## Create a new migration (usage: make migrate-create msg="description")
-	python3 -m flask db migrate -m "$(msg)"
+	docker compose exec backend flask db migrate -m "$(msg)"
 
 migrate-rollback: ## Rollback last migration
-	python3 -m flask db downgrade
+	docker compose exec backend flask db downgrade
 
 db-reset: ## Reset database (WARNING: destroys all data)
-	docker compose down -v
-	docker compose up -d db
-	sleep 10
-	python3 -m flask db upgrade
+	docker compose down -v postgres
+	docker volume rm callback-listener_postgres_data 2>/dev/null || true
+	docker compose up -d postgres
+	sleep 15
+	docker compose exec backend flask db upgrade
+
+db-init: ## Initialize database with migrations
+	docker compose exec backend flask db init
 
 # Testing
 test: ## Run all tests
@@ -145,13 +149,16 @@ clean-docker: ## Clean up Docker resources
 
 # Database Utilities
 db-backup: ## Backup database (usage: make db-backup file=backup.sql)
-	docker compose exec db pg_dump -U callback_user callback_listener_dev > $(file)
+	docker compose exec postgres pg_dump -U callback_user callback_listener > $(file)
 
 db-restore: ## Restore database (usage: make db-restore file=backup.sql)
-	docker compose exec -T db psql -U callback_user callback_listener_dev < $(file)
+	docker compose exec -T postgres psql -U callback_user callback_listener < $(file)
 
 db-shell: ## Connect to database shell
-	docker compose exec db psql -U callback_user callback_listener_dev
+	docker compose exec postgres psql -U callback_user callback_listener
+
+db-status: ## Check PostgreSQL status
+	docker compose exec postgres pg_isready -U callback_user -d callback_listener
 
 # Monitoring and Health
 health: ## Check application health
@@ -165,7 +172,7 @@ watch-logs: ## Watch application logs with automatic refresh
 	watch -n 2 'docker compose logs --tail=50 web'
 
 inspect-db: ## Show database tables and structure
-	docker compose exec db psql -U callback_user callback_listener_dev -c "\dt"
+	docker compose exec postgres psql -U callback_user callback_listener -c "\dt"
 
 seed-data: ## Seed database with sample data for development
 	python -c "from scripts.seed_data import seed_development_data; seed_development_data()"
@@ -187,9 +194,9 @@ setup-dev: ## Complete development environment setup
 	cp .env.example .env
 	uv pip install $(VENV_FLAG) -r requirements.txt
 	python3 -m pre_commit install || echo "Pre-commit hooks not installed (not in git repo)"
-	docker compose up -d db
-	sleep 10
-	python3 -m flask db upgrade
+	docker compose up -d postgres
+	sleep 15
+	docker compose exec backend flask db upgrade
 	@echo "Development environment setup complete!"
 	@echo "Run 'make dev' to start the application"
 
