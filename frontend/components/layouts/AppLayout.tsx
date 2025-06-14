@@ -3,6 +3,7 @@
 import { Sidebar } from '@/components/layouts/Sidebar';
 import { Header } from '@/components/layouts/Header';
 import { useUiStore } from '@/lib/stores/uiStore';
+import { cn } from '@/lib/utils/cn';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,8 +28,4 @@ export function AppLayout({ children }: AppLayoutProps) {
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }
