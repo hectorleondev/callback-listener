@@ -1,8 +1,14 @@
--- Database initialization script
--- Create test database if it doesn't exist
-SELECT 'CREATE DATABASE callback_listener_test'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'callback_listener_test')\gexec
+-- Database initialization script for callback-listener
+-- This script will be executed when the PostgreSQL container starts for the first time
 
--- Grant permissions
-GRANT ALL PRIVILEGES ON DATABASE callback_listener_dev TO callback_user;
-GRANT ALL PRIVILEGES ON DATABASE callback_listener_test TO callback_user;
+-- Create extensions if needed
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Set timezone
+SET timezone = 'UTC';
+
+-- Grant necessary permissions
+GRANT ALL PRIVILEGES ON DATABASE callback_listener TO callback_user;
+
+-- Create any additional schemas if needed
+-- CREATE SCHEMA IF NOT EXISTS callback_data;
