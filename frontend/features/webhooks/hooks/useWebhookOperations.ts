@@ -65,26 +65,29 @@ export function useCreateWebhook() {
     },
     onSuccess: (result) => {
       if (result.success) {
-        toast({
-          variant: "success",
-          title: "Webhook created successfully",
-          description: `Path ID: ${result.data?.path_id}`,
-        });
+        console.log('Webhook created successfully:', result.data?.path_id);
+        // toast({
+        //   variant: "success",
+        //   title: "Webhook created successfully",
+        //   description: `Path ID: ${result.data?.path_id}`,
+        // });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Failed to create webhook",
-          description: result.error,
-        });
+        console.error('Failed to create webhook:', result.error);
+        // toast({
+        //   variant: "destructive",
+        //   title: "Failed to create webhook",
+        //   description: result.error,
+        // });
       }
     },
     onError: (error, variables, context) => {
       queryClient.setQueryData(['webhooks'], context?.previousWebhooks);
-      toast({
-        variant: "destructive",
-        title: "Failed to create webhook",
-        description: "An unexpected error occurred. Please try again.",
-      });
+      console.error('Failed to create webhook:', error);
+      // toast({
+      //   variant: "destructive",
+      //   title: "Failed to create webhook",
+      //   description: "An unexpected error occurred. Please try again.",
+      // });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['webhooks'] });
