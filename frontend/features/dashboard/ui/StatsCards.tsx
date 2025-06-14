@@ -1,105 +1,129 @@
 'use client';
 
-import { useMemo } from 'react';
-import { AlertCircle, ArrowUpRight, Bell, Link as LinkIcon } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardData';
-import { formatters } from '@/lib/utils/formatters';
-import { Skeleton } from '@/components/ui/skeleton';
-import { StatusIndicator } from '@/features/common/ui/StatusIndicator';
-import { cn } from '@/lib/utils/cn';
+import { useDashboardStats } from '../hooks/useDashboardData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingSpinner } from '@/features/common/ui/LoadingSpinner';
 
 export function StatsCards() {
-  const { data, isLoading, error } = useDashboardStats();
-  
-  const stats = useMemo(() => {
-    if (!data) return null;
-    
-    return [
-      {
-        title: 'Total Webhooks',
-        value: data.total_webhooks,
-        description: 'Active endpoints',
-        icon: <LinkIcon className="h-5 w-5 text-muted-foreground" />,
-        indicator: data.total_webhooks > 0 ? (
-          <StatusIndicator status="active" size="sm" />
-        ) : null,
-      },
-      {
-        title: 'Total Requests',
-        value: data.total_requests,
-        description: 'Received callbacks',
-        icon: <Bell className="h-5 w-5 text-muted-foreground" />,
-      },
-      {
-        title: 'Active Webhooks',
-        value: data.active_webhooks,
-        description: formatters.pluralize(
-          data.active_webhooks, 
-          'endpoint', 
-          'endpoints'
-        ) + ' receiving traffic',
-        icon: <ArrowUpRight className="h-5 w-5 text-muted-foreground" />,
-        indicator: data.active_webhooks > 0 ? (
-          <StatusIndicator status="active" size="sm" pulse />
-        ) : null,
-      },
-    ];
-  }, [data]);
-  
-  if (error) {
+  const { data: stats, isLoading, error, refetch } = useDashboardStats();
+
+  if (isLoading) {
     return (
-      <Card className="border-destructive/50 bg-destructive/5">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-destructive-foreground">Error Loading Data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center">
-            <AlertCircle className="mr-2 h-4 w-4 text-destructive" />
-            <p className="text-sm text-muted-foreground">
-              Failed to load dashboard statistics.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Loading...</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center h-8">
+                <LoadingSpinner size="sm" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     );
   }
-  
+
+  if (error) {
+    return (
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive">Error Loading Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Failed to load dashboard statistics. Please check if the backend is running.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="mt-2 text-sm text-primary hover:underline"
+            >
+              Try again
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {isLoading
-        ? Array(3)
-            .fill(null)
-            .map((_, i) => (
-              <Card key={i} className={cn("overflow-hidden")}>
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-5 w-1/3" />
-                  <Skeleton className="h-4 w-1/2 mt-1" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-10 w-1/2" />
-                </CardContent>
-              </Card>
-            ))
-        : stats?.map((stat, i) => (
-            <Card key={i} className="overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div className="space-y-1">
-                  <CardTitle className="text-base">{stat.title}</CardTitle>
-                  <CardDescription>{stat.description}</CardDescription>
-                </div>
-                {stat.icon}
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl font-bold">
-                    {stat.value.toLocaleString()}
-                  </div>
-                  {stat.indicator}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="grid gap-6 md:grid-cols-3">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Webhooks</CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <path d="M12 2v20m0 0l7-7m-7 7l-7-7" />
+          </svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats?.total_webhooks || 0}</div>
+          <p className="text-xs text-muted-foreground">
+            webhook endpoints created
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+          </svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats?.total_requests || 0}</div>
+          <p className="text-xs text-muted-foreground">
+            requests captured
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Active Webhooks</CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12,6 12,12 16,14" />
+          </svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats?.active_webhooks || 0}</div>
+          <p className="text-xs text-muted-foreground">
+            webhooks receiving requests
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
